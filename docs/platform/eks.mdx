@@ -1,0 +1,122 @@
+---
+title: EKS Architecture
+---
+
+# EKS Architecture
+
+Managed Kubernetes with Karpenter autoscaling and GitOps deployment via ArgoCD.
+
+```mermaid
+flowchart TD
+    R53["Route 53<br/>External DNS"]
+    
+    ALBC["AWS Load Balancer Controller<br/>Ingress → ALB"]
+    
+    subgraph Cluster["EKS Cluster v1.29"]
+        subgraph AppNS["namespace: app"]
+            API["api<br/>Deployment<br/>×3"]
+            Worker["worker<br/>Deployment<br/>×2"]
+            Cron["cron<br/>CronJob<br/>×1"]
+            APISvc["api Service"]
+        end
+        
+        subgraph PlatNS["namespace: platform"]
+            ExtDNS["external-dns<br/>Deployment<br/>×1"]
+            Metrics["metrics-server<br/>Deployment<br/>×1"]
+            CertMgr["cert-manager<br/>Deployment<br/>×1"]
+        end
+        
+        subgraph NodeGroups["Node Groups"]
+            General["general<br/>m6i.large<br/>2-10 nodes"]
+            Compute["compute<br/>c6i.xlarge<br/>0-20 nodes"]
+            Memory["memory<br/>r6i.large<br/>0-5 nodes"]
+        end
+    end
+    
+    GitOps["GitOps with ArgoCD<br/>github.com/acme/k8s-manifests<br/>Auto-sync enabled"]
+    
+    subgraph Addons["EKS Managed Addons"]
+        VPC["vpc-cni"]
+        Kube["kube-proxy"]
+        Core["coredns"]
+        EBS["aws-ebs-csi-driver"]
+        EFS["aws-efs-csi-driver"]
+        GD["guardduty-agent"]
+    end
+    
+    R53 --> ALBC
+    ALBC --> APISvc
+    APISvc --> API
+    
+    GitOps -.->|Watch| AppNS
+    GitOps -.->|Watch| PlatNS
+    
+    AppNS --> NodeGroups
+    PlatNS --> NodeGroups
+    
+    style R53 fill:#9b59b6,color:#fff
+    style ALBC fill:#27ae60,color:#fff
+    style Cluster fill:#3498db,color:#fff
+    style GitOps fill:#f39c12,color:#000
+    style General fill:#95a5a6,color:#000
+    style Compute fill:#95a5a6,color:#000
+    style Memory fill:#95a5a6,color:#000
+```
+
+## Key Features
+
+- **Managed Control Plane**: AWS manages Kubernetes control plane (API server, etcd)
+- **Karpenter**: Just-in-time node provisioning based on pod requirements
+- **GitOps**: ArgoCD syncs manifests from Git to cluster
+- **AWS Load Balancer Controller**: Provisions ALB/NLB from Ingress resources
+- **Service Mesh**: Optional Istio/Linkerd for observability
+- **Auto-Scaling**: HPA for pods, Karpenter for nodes
+
+## Node Groups
+
+### general
+- **Instance Type**: m6i.large (2 vCPU, 8 GB)
+- **Scaling**: 2-10 nodes
+- **Purpose**: General-purpose workloads
+- **Taints**: None
+
+### compute
+- **Instance Type**: c6i.xlarge (4 vCPU, 8 GB)
+- **Scaling**: 0-20 nodes
+- **Purpose**: CPU-intensive workloads
+- **Taints**: workload=compute:NoSchedule
+
+### memory
+- **Instance Type**: r6i.large (2 vCPU, 16 GB)
+- **Scaling**: 0-5 nodes
+- **Purpose**: Memory-intensive workloads
+- **Taints**: workload=memory:NoSchedule
+
+## Namespaces
+
+### app
+- Application workloads (api, worker, cron)
+- Resource quotas and limits enforced
+- Network policies for isolation
+
+### platform
+- Platform services (external-dns, cert-manager, metrics-server)
+- Cluster-wide addons
+- Elevated permissions
+
+## EKS Managed Addons
+
+- **vpc-cni**: AWS VPC networking for pods
+- **kube-proxy**: Network proxy for Services
+- **coredns**: DNS server for service discovery
+- **aws-ebs-csi-driver**: EBS volumes for persistent storage
+- **aws-efs-csi-driver**: EFS for shared storage
+- **guardduty-agent**: Runtime threat detection
+
+## GitOps with ArgoCD
+
+- **Repository**: github.com/acme/k8s-manifests
+- **Auto-Sync**: Automatically apply changes from Git
+- **Self-Heal**: Revert manual changes to match Git
+- **Pruning**: Delete resources removed from Git
+- **App of Apps**: Manage multiple applications

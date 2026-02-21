@@ -1,0 +1,113 @@
+---
+title: ECS Architecture
+---
+
+# ECS Architecture
+
+Container orchestration with Fargate and EC2 capacity providers, internal/external ALBs, and Service Discovery.
+
+```mermaid
+flowchart TD
+    Users((Users))
+    
+    ExtALB["External ALB<br/>Public + HTTPS<br/>Shield + WAF"]
+    
+    IntALB["Internal ALB<br/>Private + Service-to-Service"]
+    
+    subgraph Cluster["ECS Cluster"]
+        subgraph Services["Services"]
+            API["api-service<br/>3 tasks<br/>512 CPU, 1024 MB"]
+            Worker["worker-service<br/>2 tasks<br/>1024 CPU, 2048 MB"]
+            Scheduler["scheduler-service<br/>1 task<br/>256 CPU, 512 MB"]
+        end
+        
+        SD["Service Discovery<br/>Cloud Map"]
+    end
+    
+    subgraph Support["Supporting Services"]
+        ECR["ECR<br/>Container Registry"]
+        Secrets["Secrets Manager<br/>DB credentials, API keys"]
+        Params["Parameter Store<br/>Environment vars, Feature flags"]
+        CW["CloudWatch<br/>Logs, Metrics, Alarms"]
+    end
+    
+    Users --> ExtALB
+    ExtALB --> API
+    IntALB --> Worker
+    IntALB --> Scheduler
+    
+    Services --> SD
+    Services -.-> ECR
+    Services -.-> Secrets
+    Services -.-> Params
+    Services -.-> CW
+    
+    style ExtALB fill:#27ae60,color:#fff
+    style IntALB fill:#3498db,color:#fff
+    style Cluster fill:#e67e22,color:#fff
+    style ECR fill:#9b59b6,color:#fff
+    style Secrets fill:#f39c12,color:#000
+    style Params fill:#3498db,color:#fff
+    style CW fill:#f39c12,color:#000
+```
+
+## Key Features
+
+- **Fargate**: Serverless compute, no EC2 management
+- **Service Discovery**: Cloud Map for DNS-based service discovery
+- **External ALB**: Public-facing HTTPS with WAF/Shield
+- **Internal ALB**: Private service-to-service communication
+- **Auto Scaling**: Target tracking based on CPU/memory/ALB metrics
+- **Blue-Green Deployments**: CodeDeploy integration for zero-downtime
+
+## Capacity Providers
+
+### FARGATE
+- Serverless compute, pay per vCPU/memory
+- No infrastructure management
+- Best for: Most workloads
+
+### FARGATE_SPOT
+- Up to 70% cost savings
+- Can be interrupted with 2-minute warning
+- Best for: Fault-tolerant batch jobs
+
+### EC2
+- Self-managed instances with ECS agent
+- More control over instance type/AMI
+- Best for: GPU workloads, reserved capacity
+
+### EC2_SPOT
+- Up to 90% cost savings
+- Can be interrupted
+- Best for: Stateless, fault-tolerant workloads
+
+## Service Configuration
+
+### api-service
+- **Tasks**: 3 (high availability)
+- **CPU**: 512 (0.5 vCPU)
+- **Memory**: 1024 MB
+- **Load Balancer**: External ALB
+- **Health Check**: /health endpoint
+
+### worker-service
+- **Tasks**: 2
+- **CPU**: 1024 (1 vCPU)
+- **Memory**: 2048 MB
+- **Load Balancer**: Internal ALB
+- **Trigger**: SQS queue
+
+### scheduler-service
+- **Tasks**: 1
+- **CPU**: 256 (0.25 vCPU)
+- **Memory**: 512 MB
+- **Schedule**: EventBridge cron
+- **Purpose**: Background jobs
+
+## Supporting Services
+
+- **ECR**: Private container registry with image scanning
+- **Secrets Manager**: Automatic rotation for DB credentials
+- **Parameter Store**: Environment variables and feature flags
+- **CloudWatch**: Logs, metrics, and alarms for monitoring

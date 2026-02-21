@@ -37,7 +37,7 @@ const config = {
       {
         docs: {
           sidebarPath: "./sidebars.js",
-          routeBasePath: "docs",
+          routeBasePath: "/",
           editUrl: "https://github.com/AnyStackIo/diagram-library/tree/main/",
         },
         blog: false,
@@ -52,8 +52,7 @@ const config = {
     navbar: {
       title: "AnyStack",
       items: [
-        { type: "doc", docId: "resources/architecture-diagrams", label: "Diagrams", position: "left" },
-        { type: "doc", docId: "intro", label: "Docs", position: "left" },
+        { type: "doc", docId: "index", label: "Diagrams", position: "left" },
         { href: "https://github.com/AnyStackIo/diagram-library", label: "Repo", position: "right" },
       ],
     },

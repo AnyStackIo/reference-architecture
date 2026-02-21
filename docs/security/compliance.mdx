@@ -1,0 +1,59 @@
+---
+title: Compliance Monitoring
+---
+
+# Compliance Monitoring
+
+Centralized compliance monitoring with Security Hub, GuardDuty threat detection, and AWS Config.
+
+```mermaid
+flowchart TD
+    GD["GuardDuty<br/>Threat Detection"]
+    Insp["Inspector<br/>Vulnerability Scan"]
+    Config["Config<br/>Resource Compliance"]
+    
+    SH["Security Hub<br/>Central Aggregation"]
+    
+    AM["Audit Manager<br/>Compliance Evidence"]
+    
+    Shield["Shield<br/>DDoS Protection"]
+    WAF["WAF<br/>L7 Filtering"]
+    R53["Route53 DNS<br/>DNS Firewall"]
+    
+    GD -->|Findings| SH
+    Insp -->|Findings| SH
+    Config -->|Findings| SH
+    Shield -->|Findings| SH
+    WAF -->|Findings| SH
+    R53 -->|Findings| SH
+    
+    SH -->|Evidence| AM
+    
+    style GD fill:#f39c12,color:#000
+    style Insp fill:#f39c12,color:#000
+    style Config fill:#f39c12,color:#000
+    style SH fill:#27ae60,color:#fff
+    style AM fill:#3498db,color:#fff
+    style Shield fill:#c0392b,color:#fff
+    style WAF fill:#c0392b,color:#fff
+    style R53 fill:#9b59b6,color:#fff
+```
+
+## Key Features
+
+- **GuardDuty**: Continuous threat detection analyzing VPC Flow Logs, CloudTrail, and DNS logs
+- **Inspector**: Automated vulnerability scanning for EC2, ECR, and Lambda
+- **AWS Config**: Resource compliance tracking with managed and custom rules
+- **Security Hub**: Central aggregation point for all security findings across accounts
+- **Audit Manager**: Automated evidence collection for compliance frameworks (SOC 2, PCI-DSS, HIPAA)
+- **AWS Shield**: DDoS protection at L3/L4 with automatic mitigation
+- **WAF**: Layer 7 attack mitigation with custom rules
+- **Route53 DNS Firewall**: Block malicious domains at DNS level
+
+## Security Findings Flow
+
+1. Detection services (GuardDuty, Inspector, Config) continuously monitor resources
+2. Findings are sent to Security Hub in the core-security account
+3. Security Hub aggregates and prioritizes findings
+4. Audit Manager collects evidence for compliance reporting
+5. Alerts trigger notifications via SNS/EventBridge for critical findings

@@ -1,0 +1,106 @@
+---
+title: Defense in Depth
+---
+
+# Defense in Depth
+
+Multi-layer security with AWS Shield, WAF, Network Firewall, and DNS Firewall spanning 8 security layers.
+
+```mermaid
+graph TD
+    subgraph Perimeter["Perimeter Layer"]
+        P1["AWS Shield<br/>WAF<br/>Network Firewall"]
+    end
+    
+    subgraph Network["Network Layer"]
+        N1["Security Groups<br/>NACLs<br/>VPC Flow Logs"]
+    end
+    
+    subgraph Endpoint["Endpoint Layer"]
+        E1["GuardDuty<br/>Inspector<br/>Systems Manager"]
+    end
+    
+    subgraph Application["Application Layer"]
+        A1["IAM Policies<br/>Secrets Manager<br/>Certificate Manager"]
+    end
+    
+    subgraph Data["Data Layer"]
+        D1["KMS Encryption<br/>S3 Bucket Policies<br/>RDS Encryption"]
+    end
+    
+    Gov["Governance<br/>Policy"]
+    Comp["Compliance<br/>Monitoring"]
+    
+    Perimeter --> Network
+    Network --> Endpoint
+    Endpoint --> Application
+    Application --> Data
+    
+    Gov -.-> Perimeter
+    Gov -.-> Network
+    Gov -.-> Endpoint
+    Gov -.-> Application
+    Gov -.-> Data
+    
+    Comp -.-> Perimeter
+    Comp -.-> Network
+    Comp -.-> Endpoint
+    Comp -.-> Application
+    Comp -.-> Data
+    
+    style Perimeter fill:#8e44ad,color:#fff
+    style Network fill:#8e44ad,color:#fff
+    style Endpoint fill:#8e44ad,color:#fff
+    style Application fill:#8e44ad,color:#fff
+    style Data fill:#8e44ad,color:#fff
+    style Gov fill:#16a085,color:#fff
+    style Comp fill:#3498db,color:#fff
+```
+
+## Security Layers
+
+### 1. Perimeter Layer
+- **AWS Shield Advanced**: DDoS protection with 24/7 DRT support
+- **WAF**: Layer 7 attack mitigation (SQL injection, XSS, rate limiting)
+- **Network Firewall**: Stateful inspection and IDS/IPS capabilities
+
+### 2. Network Layer
+- **Security Groups**: Stateful firewall at instance level
+- **NACLs**: Stateless firewall at subnet level
+- **VPC Flow Logs**: Network traffic visibility and analysis
+
+### 3. Endpoint Layer
+- **GuardDuty**: Threat detection for EC2, containers, and serverless
+- **Inspector**: Vulnerability and patch management
+- **Systems Manager**: Patch automation and configuration management
+
+### 4. Application Layer
+- **IAM Policies**: Least-privilege access control
+- **Secrets Manager**: Secure credential storage with rotation
+- **Certificate Manager**: TLS/SSL certificate management
+
+### 5. Data Layer
+- **KMS Encryption**: Encryption at rest for all data stores
+- **S3 Bucket Policies**: Fine-grained access control
+- **RDS Encryption**: Database encryption with automated backups
+
+## Cross-Cutting Concerns
+
+### Governance (Policy)
+- Service Control Policies (SCPs) at OU level
+- IAM permission boundaries
+- Resource tagging policies
+- Backup policies
+
+### Compliance (Monitoring)
+- Security Hub for centralized findings
+- Config rules for compliance checks
+- Audit Manager for evidence collection
+- CloudWatch alarms for security events
+
+## Key Features
+
+- Multiple security layers with Governance (Policy) and Compliance (Monitoring) spanning all layers
+- Defense in depth approach ensures no single point of failure
+- Automated compliance monitoring and remediation
+- Centralized security operations in core-security account

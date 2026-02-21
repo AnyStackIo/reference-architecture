@@ -1,0 +1,116 @@
+---
+title: Platform VPC
+---
+
+# Platform Account VPC
+
+Per-account VPC architecture with multi-AZ subnets, load balancers, and VPC endpoints.
+
+```mermaid
+flowchart TD
+    Internet((Internet))
+    
+    IGW["Internet Gateway<br/>Public Access"]
+    
+    subgraph Security["Security Layer"]
+        WAF["AWS WAF"]
+        Shield["AWS Shield"]
+        DNSFW["Route53 DNS Firewall"]
+    end
+    
+    ExtALB["External ALB<br/>ACM Certificate"]
+    IntALB["Internal ALB<br/>Service-to-Service"]
+    
+    subgraph AZ1["us-east-2a"]
+        Pub1["Public Subnet"]
+        Priv1["Private Subnet"]
+    end
+    
+    subgraph AZ2["us-east-2b"]
+        Pub2["Public Subnet"]
+        Priv2["Private Subnet"]
+    end
+    
+    subgraph AZ3["us-east-2c"]
+        Pub3["Public Subnet"]
+        Priv3["Private Subnet"]
+    end
+    
+    NAT["NAT Gateway<br/>Private Subnet Egress"]
+    
+    subgraph Endpoints["VPC Endpoints"]
+        S3EP["S3 Gateway"]
+        ECREP["ECR Interface"]
+        SSMEP["SSM Interface"]
+        KMSEP["KMS Interface"]
+    end
+    
+    Internet --> IGW
+    IGW --> WAF
+    WAF --> Shield
+    Shield --> DNSFW
+    DNSFW --> ExtALB
+    
+    ExtALB --> Pub1
+    ExtALB --> Pub2
+    ExtALB --> Pub3
+    
+    IntALB --> Priv1
+    IntALB --> Priv2
+    IntALB --> Priv3
+    
+    Priv1 --> NAT
+    Priv2 --> NAT
+    Priv3 --> NAT
+    NAT --> IGW
+    
+    Priv1 -.-> S3EP
+    Priv1 -.-> ECREP
+    
+    style IGW fill:#3498db,color:#fff
+    style WAF fill:#c0392b,color:#fff
+    style Shield fill:#c0392b,color:#fff
+    style DNSFW fill:#9b59b6,color:#fff
+    style ExtALB fill:#27ae60,color:#fff
+    style IntALB fill:#3498db,color:#fff
+    style NAT fill:#f39c12,color:#000
+```
+
+## Key Features
+
+- **Multi-AZ**: 3 availability zones for high availability (us-east-2a, 2b, 2c)
+- **Public Subnets**: Host NAT Gateways and public-facing load balancers
+- **Private Subnets**: Host application workloads (ECS, EKS, Lambda)
+- **Internet Gateway**: Public internet access for external ALB
+- **NAT Gateway**: Outbound internet access for private subnets
+- **VPC Endpoints**: Private connectivity to AWS services without internet traversal
+
+## CIDR Allocation
+
+- **plat-prod**: 10.1.0.0/16
+- **plat-dev**: 10.2.0.0/16
+- **plat-staging**: 10.3.0.0/16
+
+## Load Balancers
+
+### External ALB
+- **Purpose**: Public-facing HTTPS traffic
+- **Subnets**: Public subnets in all 3 AZs
+- **Security**: WAF + Shield + ACM certificate
+- **Targets**: ECS tasks, EKS pods, Lambda functions
+
+### Internal ALB
+- **Purpose**: Service-to-service communication
+- **Subnets**: Private subnets in all 3 AZs
+- **Security**: Security groups only
+- **Targets**: Internal microservices
+
+## VPC Endpoints
+
+- **S3 Gateway**: Free, no data transfer charges
+- **ECR (dkr, api)**: Pull container images privately
+- **SSM**: Systems Manager access without internet
+- **Secrets Manager**: Retrieve secrets privately
+- **KMS**: Encryption operations
+- **SQS/SNS**: Messaging services
+- **EC2 Messages**: SSM Session Manager

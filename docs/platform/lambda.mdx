@@ -1,0 +1,151 @@
+---
+title: Lambda Architecture
+---
+
+# Lambda Architecture
+
+Event-driven serverless compute with multiple trigger sources and VPC integration.
+
+```mermaid
+flowchart LR
+    subgraph Sources["Event Sources"]
+        APIGW["API Gateway<br/>HTTP"]
+        SQS["SQS Queue<br/>Queue"]
+        EB["EventBridge<br/>Events"]
+        S3["S3 Bucket<br/>Object"]
+    end
+    
+    subgraph Functions["Lambda Functions"]
+        APIHandler["api-handler<br/>nodejs20.x<br/>1024 MB, 30s"]
+        QueueProc["queue-processor<br/>python3.12<br/>512 MB, 300s"]
+        EventHandler["event-handler<br/>nodejs20.x<br/>256 MB, 60s"]
+        S3Proc["s3-processor<br/>python3.12<br/>2048 MB, 900s"]
+        Auth["authorizer<br/>nodejs20.x<br/>128 MB, 5s"]
+        Sched["scheduled-task<br/>python3.12<br/>512 MB, 300s"]
+    end
+    
+    subgraph Layers["Lambda Layers"]
+        Common["common-utils<br/>v12, 2.1MB"]
+        DB["database-client<br/>v8, 15.3MB"]
+        Obs["observability<br/>v5, 4.7MB"]
+    end
+    
+    subgraph Config["Function Configuration"]
+        VPCAcc["VPC Access: Enabled"]
+        XRay["X-Ray Tracing: Active"]
+        SecAcc["Secrets Access: Secrets Manager"]
+        DLQ["Dead Letter Queue: SQS"]
+    end
+    
+    subgraph Downstream["Downstream Services"]
+        RDS["RDS<br/>PostgreSQL"]
+        Dynamo["DynamoDB<br/>NoSQL"]
+        S3Out["S3<br/>Storage"]
+        SNS["SNS<br/>Notifications"]
+        Step["Step Functions<br/>Orchestration"]
+    end
+    
+    APIGW --> APIHandler
+    SQS --> QueueProc
+    EB --> EventHandler
+    S3 --> S3Proc
+    APIGW --> Auth
+    EB --> Sched
+    
+    Functions -.-> Layers
+    Functions -.-> Config
+    Functions --> Downstream
+    
+    style APIGW fill:#3498db,color:#fff
+    style SQS fill:#f39c12,color:#000
+    style EB fill:#9b59b6,color:#fff
+    style S3 fill:#27ae60,color:#fff
+    style Functions fill:#e67e22,color:#fff
+    style RDS fill:#3498db,color:#fff
+    style Dynamo fill:#f39c12,color:#000
+```
+
+## Key Features
+
+- **Event-Driven**: Triggered by API Gateway, SQS, EventBridge, S3, etc.
+- **Auto-Scaling**: Scales from 0 to thousands of concurrent executions
+- **VPC Access**: Connect to RDS, ElastiCache, and other VPC resources
+- **Lambda Layers**: Share code and dependencies across functions
+- **Provisioned Concurrency**: Pre-warmed instances for low latency
+- **Dead Letter Queue**: Capture failed invocations for retry
+
+## Lambda Functions
+
+### api-handler
+- **Runtime**: nodejs20.x
+- **Memory**: 1024 MB
+- **Timeout**: 30s
+- **Trigger**: API Gateway HTTP requests
+- **Purpose**: REST API endpoints
+
+### queue-processor
+- **Runtime**: python3.12
+- **Memory**: 512 MB
+- **Timeout**: 300s (5 min)
+- **Trigger**: SQS queue messages
+- **Purpose**: Async background processing
+
+### event-handler
+- **Runtime**: nodejs20.x
+- **Memory**: 256 MB
+- **Timeout**: 60s
+- **Trigger**: EventBridge events
+- **Purpose**: Event-driven workflows
+
+### s3-processor
+- **Runtime**: python3.12
+- **Memory**: 2048 MB
+- **Timeout**: 900s (15 min)
+- **Trigger**: S3 object creation
+- **Purpose**: File processing (images, videos, documents)
+
+### authorizer
+- **Runtime**: nodejs20.x
+- **Memory**: 128 MB
+- **Timeout**: 5s
+- **Trigger**: API Gateway authorizer
+- **Purpose**: JWT validation, custom auth
+
+### scheduled-task
+- **Runtime**: python3.12
+- **Memory**: 512 MB
+- **Timeout**: 300s
+- **Trigger**: EventBridge cron schedule
+- **Purpose**: Periodic maintenance tasks
+
+## Lambda Layers
+
+### common-utils (v12, 2.1MB)
+- Shared utility functions
+- Logging and error handling
+- Configuration management
+
+### database-client (v8, 15.3MB)
+- PostgreSQL client library
+- Connection pooling
+- Query helpers
+
+### observability (v5, 4.7MB)
+- X-Ray SDK
+- CloudWatch metrics
+- Structured logging
+
+## Function Configuration
+
+- **VPC Access**: Connect to RDS and ElastiCache in private subnets
+- **X-Ray Tracing**: Distributed tracing for debugging
+- **Secrets Access**: Retrieve credentials from Secrets Manager
+- **Dead Letter Queue**: SQS queue for failed invocations
+
+## Downstream Services
+
+- **RDS**: PostgreSQL for relational data
+- **DynamoDB**: NoSQL for high-throughput workloads
+- **S3**: Object storage for files and artifacts
+- **SNS**: Pub/sub notifications
+- **Step Functions**: Orchestrate complex workflows

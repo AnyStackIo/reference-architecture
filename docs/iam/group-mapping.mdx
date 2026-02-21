@@ -1,0 +1,66 @@
+---
+title: Group Mapping
+---
+
+# Group Mapping
+
+IdP groups mapped to SSO permission sets across AWS accounts for role-based access control.
+
+```mermaid
+flowchart LR
+    subgraph Groups["SSO Groups"]
+        DevOps["DevOps"]
+        Devs["Developers"]
+    end
+    
+    subgraph DevAcc["Dev Account"]
+        DevApply["TerraformApplyAccess"]
+        DevPlan["TerraformPlanAccess"]
+    end
+    
+    subgraph ProdAcc["Prod Account"]
+        ProdApply["TerraformApplyAccess"]
+        ProdPlan["TerraformPlanAccess"]
+    end
+    
+    DevOps -.-> DevApply
+    DevOps -.-> ProdApply
+    
+    Devs -.-> DevPlan
+    Devs -.-> ProdPlan
+    
+    style DevOps fill:#95a5a6,color:#000
+    style Devs fill:#95a5a6,color:#000
+    style DevApply fill:#27ae60,color:#fff
+    style DevPlan fill:#3498db,color:#fff
+    style ProdApply fill:#27ae60,color:#fff
+    style ProdPlan fill:#3498db,color:#fff
+```
+
+## Key Features
+
+- **Group-Based Access**: Assign permissions via IdP groups
+- **Automatic Sync**: SCIM keeps groups in sync
+- **Least Privilege**: Developers get read-only in prod
+- **Separation of Duties**: Different permissions per environment
+
+## Example Mappings
+
+### DevOps Team
+- **Dev Account**: TerraformApplyAccess (write)
+- **Prod Account**: TerraformApplyAccess (write)
+- **Purpose**: Full infrastructure management
+
+### Developers
+- **Dev Account**: TerraformPlanAccess (read-only)
+- **Prod Account**: TerraformPlanAccess (read-only)
+- **Purpose**: View infrastructure, no changes
+
+### Platform Team
+- **All Accounts**: AdministratorAccess
+- **Purpose**: Full AWS console access
+
+### Security Team
+- **core-security**: AdministratorAccess
+- **All Accounts**: ReadOnlyAccess + SecurityAudit
+- **Purpose**: Security monitoring and incident response

@@ -1,0 +1,74 @@
+---
+title: VPC Flow Logs
+---
+
+# VPC Flow Logs
+
+VPC Flow Logs from all accounts centralized in the audit account for network visibility.
+
+```mermaid
+flowchart TD
+    subgraph VPCs["VPCs Across Accounts"]
+        NetVPC["core-network VPC"]
+        AutoVPC["core-auto VPC"]
+        DevVPC["plat-dev VPC"]
+        StgVPC["plat-staging VPC"]
+        PrdVPC["plat-prod VPC"]
+    end
+    
+    FlowLogs["VPC Flow Logs<br/>All Traffic Captured"]
+    
+    Audit["core-audit<br/>Central Logging"]
+    
+    KMS["KMS Key<br/>SSE-KMS Encryption"]
+    S3["S3 Bucket<br/>Flow Logs Storage"]
+    
+    NetVPC --> FlowLogs
+    AutoVPC --> FlowLogs
+    DevVPC --> FlowLogs
+    StgVPC --> FlowLogs
+    PrdVPC --> FlowLogs
+    
+    FlowLogs -->|Centralized| Audit
+    Audit --> KMS
+    KMS -->|Encrypts| S3
+    Audit --> S3
+    
+    style FlowLogs fill:#f39c12,color:#000
+    style Audit fill:#c0392b,color:#fff
+    style KMS fill:#9b59b6,color:#fff
+    style S3 fill:#27ae60,color:#fff
+```
+
+## Key Features
+
+- **All VPCs**: Flow logs enabled on every VPC across all accounts
+- **Centralized Storage**: Logs delivered to core-audit S3 bucket
+- **Encryption**: SSE-KMS encryption with customer-managed key
+- **Athena Queries**: Analyze network traffic patterns with SQL
+- **GuardDuty Integration**: Threat detection using flow log analysis
+- **Custom Format**: Capture specific fields for cost optimization
+
+## What's Captured
+
+- **Source/Destination**: IP addresses and ports
+- **Protocol**: TCP, UDP, ICMP
+- **Action**: ACCEPT or REJECT
+- **Bytes/Packets**: Traffic volume
+- **Flow Direction**: Ingress or egress
+- **VPC Endpoint**: Traffic through VPC endpoints
+
+## Use Cases
+
+- **Security Analysis**: Identify unauthorized access attempts
+- **Network Troubleshooting**: Debug connectivity issues
+- **Cost Optimization**: Identify high-traffic endpoints
+- **Compliance**: Network activity audit trail
+- **Threat Detection**: Unusual traffic patterns
+
+## Analysis Tools
+
+- **Athena**: SQL queries for ad-hoc analysis
+- **CloudWatch Insights**: Real-time log analysis
+- **VPC Flow Logs Insights**: Built-in analysis tool
+- **Third-party SIEM**: Export to Splunk, Datadog, etc.

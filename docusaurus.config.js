@@ -3,17 +3,17 @@ import {themes as prismThemes} from "prism-react-renderer";
 
 /** @type {import("@docusaurus/types").Config} */
 const config = {
-  title: "AnyStack Diagram Library",
+  title: "AnyStack Reference Architecture",
   tagline: "Internal architecture references",
   favicon: "img/favicon.ico",
 
-  // GitHub Pages project site:
-  // https://anystackio.github.io/diagram-library/
-  url: "https://anystackio.github.io",
-  baseUrl: "/diagram-library/",
+  // GitHub Pages custom domain:
+  // https://architecture.any-stack.com/
+  url: "https://architecture.any-stack.com",
+  baseUrl: "/",
 
   organizationName: "AnyStackIo",
-  projectName: "diagram-library",
+  projectName: "reference-architecture",
 
   onBrokenLinks: "throw",
 
@@ -37,8 +37,7 @@ const config = {
       {
         docs: {
           sidebarPath: "./sidebars.js",
-          routeBasePath: "docs",
-          editUrl: "https://github.com/AnyStackIo/diagram-library/tree/main/",
+          routeBasePath: "/",
         },
         blog: false,
         theme: {
@@ -49,16 +48,16 @@ const config = {
   ],
 
   themeConfig: {
+    colorMode: {
+      defaultMode: "dark",
+    },
     navbar: {
       title: "AnyStack",
       items: [
-        { type: "doc", docId: "resources/architecture-diagrams", label: "Diagrams", position: "left" },
-        { type: "doc", docId: "intro", label: "Docs", position: "left" },
-        { href: "https://github.com/AnyStackIo/diagram-library", label: "Repo", position: "right" },
+        { type: "doc", docId: "index", label: "Diagrams", position: "left" },
       ],
     },
     footer: {
-      style: "dark",
       copyright: `Copyright © ${new Date().getFullYear()} AnyStack.`,
     },
     prism: {

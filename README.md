@@ -1,4 +1,4 @@
-# AnyStack Diagram Library (Docusaurus + Mermaid)
+# AnyStack Reference Architecture (Docusaurus + Mermaid)
 
 Run locally:
 ```bash

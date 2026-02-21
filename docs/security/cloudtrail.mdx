@@ -1,0 +1,69 @@
+---
+title: CloudTrail Architecture
+---
+
+# CloudTrail Architecture
+
+Organization-wide CloudTrail logs centralized in the audit account S3 bucket with encryption at rest.
+
+```mermaid
+flowchart TD
+    subgraph Accounts["Member Accounts"]
+        Root["core-root"]
+        DNS["core-dns"]
+        Sec["core-security"]
+        Net["core-network"]
+        Dev["plat-dev"]
+        Stg["plat-staging"]
+        Prd["plat-prod"]
+    end
+    
+    OrgTrail["Organization Trail<br/>All Accounts"]
+    
+    Audit["core-audit<br/>Central Logging"]
+    
+    KMS["KMS Key<br/>SSE-KMS Encryption"]
+    S3["S3 Bucket<br/>CloudTrail Logs"]
+    
+    Root --> OrgTrail
+    DNS --> OrgTrail
+    Sec --> OrgTrail
+    Net --> OrgTrail
+    Dev --> OrgTrail
+    Stg --> OrgTrail
+    Prd --> OrgTrail
+    
+    OrgTrail -->|Centralized| Audit
+    Audit --> KMS
+    KMS -->|Encrypts| S3
+    Audit --> S3
+    
+    style OrgTrail fill:#f39c12,color:#000
+    style Audit fill:#c0392b,color:#fff
+    style KMS fill:#9b59b6,color:#fff
+    style S3 fill:#27ae60,color:#fff
+```
+
+## Key Features
+
+- **Organization Trail**: Single trail captures API activity from all accounts in the organization
+- **Centralized Storage**: All logs stored in core-audit account S3 bucket
+- **Encryption at Rest**: SSE-KMS encryption with customer-managed key
+- **Immutable Logs**: S3 Object Lock prevents deletion or modification
+- **Log File Validation**: Ensures log integrity with digital signatures
+- **Athena Integration**: Query logs using SQL for security analysis
+- **EventBridge Integration**: Real-time alerting on critical API calls
+
+## What's Logged
+
+- **Management Events**: Control plane operations (CreateBucket, RunInstances, etc.)
+- **Data Events**: Data plane operations (S3 GetObject, Lambda Invoke, etc.)
+- **Insights Events**: Unusual API activity detection
+- **Global Services**: IAM, STS, CloudFront logged in us-east-1
+
+## Retention & Analysis
+
+- **S3 Lifecycle**: Transition to Glacier after 90 days, delete after 7 years
+- **Athena Queries**: Ad-hoc analysis of API activity
+- **CloudWatch Logs**: Real-time monitoring with metric filters
+- **Security Hub**: Automated findings for suspicious activity

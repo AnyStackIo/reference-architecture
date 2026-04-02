@@ -4,7 +4,7 @@ set -euo pipefail
 CFG="docusaurus.config.js"
 
 if [[ ! -f "$CFG" ]]; then
-  echo "ERROR: $CFG not found. Run this from the repo root (diagram-library/)."
+  echo "ERROR: $CFG not found. Run this from the repo root (reference-architecture/)."
   exit 1
 fi
 
@@ -30,7 +30,7 @@ replacement_navbar = (
     '      items: [\n'
     '        { type: "doc", docId: "resources/architecture-diagrams", label: "Diagrams", position: "left" },\n'
     '        { type: "doc", docId: "intro", label: "Docs", position: "left" },\n'
-    '        { href: "https://github.com/AnyStackIo/diagram-library", label: "Repo", position: "right" },\n'
+    '        { href: "https://github.com/AnyStackIo/reference-architecture", label: "Repo", position: "right" },\n'
     '      ],\n'
     '    }'
 )

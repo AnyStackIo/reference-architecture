@@ -3,17 +3,17 @@ import {themes as prismThemes} from "prism-react-renderer";
 
 /** @type {import("@docusaurus/types").Config} */
 const config = {
-  title: "AnyStack Diagram Library",
+  title: "AnyStack Reference Architecture",
   tagline: "Internal architecture references",
   favicon: "img/favicon.ico",
 
   // GitHub Pages project site:
-  // https://anystackio.github.io/diagram-library/
+  // https://anystackio.github.io/reference-architecture/
   url: "https://anystackio.github.io",
-  baseUrl: "/diagram-library/",
+  baseUrl: "/reference-architecture/",
 
   organizationName: "AnyStackIo",
-  projectName: "diagram-library",
+  projectName: "reference-architecture",
 
   onBrokenLinks: "throw",
 
@@ -38,7 +38,7 @@ const config = {
         docs: {
           sidebarPath: "./sidebars.js",
           routeBasePath: "/",
-          editUrl: "https://github.com/AnyStackIo/diagram-library/tree/main/",
+          editUrl: "https://github.com/AnyStackIo/reference-architecture/tree/main/",
         },
         blog: false,
         theme: {
@@ -53,7 +53,7 @@ const config = {
       title: "AnyStack",
       items: [
         { type: "doc", docId: "index", label: "Diagrams", position: "left" },
-        { href: "https://github.com/AnyStackIo/diagram-library", label: "Repo", position: "right" },
+        { href: "https://github.com/AnyStackIo/reference-architecture", label: "Repo", position: "right" },
       ],
     },
     footer: {

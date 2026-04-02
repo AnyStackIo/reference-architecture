@@ -6,6 +6,12 @@ title: Defense in Depth
 
 Multi-layer security with AWS Shield, WAF, Network Firewall, and DNS Firewall spanning 8 security layers.
 
+## Problems this Architecture solves
+
+- Reduces overreliance on any single security control by layering protections from edge to data.
+- Clarifies which controls operate at the perimeter, network, endpoint, application, and data layers.
+- Improves resilience when one control fails or is bypassed by ensuring other layers still apply.
+
 ```mermaid
 graph TD
     subgraph Perimeter["Perimeter Layer"]

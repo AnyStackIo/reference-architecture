@@ -6,6 +6,12 @@ title: ECS Architecture
 
 Container orchestration with Fargate and EC2 capacity providers, internal/external ALBs, and Service Discovery.
 
+## Problems this Architecture solves
+
+- Standardizes how containerized services are exposed, discovered, and scaled in ECS.
+- Reduces operational overhead for teams that need managed runtime options without building cluster primitives from scratch.
+- Centralizes secrets, parameters, logs, and deployment behavior around a repeatable service pattern.
+
 ```mermaid
 flowchart TD
     Users((Users))

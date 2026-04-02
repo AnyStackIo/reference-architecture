@@ -6,10 +6,13 @@ sidebar_position: 6
 # Software Delivery
 
 CI/CD infrastructure with developer workflow, self-hosted runners, OIDC federation, and GitOps deployments.
+This delivery architecture standardizes how code moves from local development into shared environments and production. It combines workflow stages, private runner infrastructure, short-lived AWS authentication, and GitOps deployment patterns so releases stay auditable, repeatable, and aligned with the rest of the platform foundation.
 
-## Overview
+## Problems this Architecture solves
 
-End-to-end software delivery from local development to production with automated testing and deployment.
+- Replaces inconsistent release processes with a defined promotion path from development to production.
+- Removes static deployment credentials by standardizing short-lived, auditable authentication patterns.
+- Reduces deployment drift and manual coordination across environments and runtime platforms.
 
 ## Diagrams
 

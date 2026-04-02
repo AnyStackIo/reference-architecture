@@ -6,6 +6,12 @@ title: Self-Hosted Runners
 
 Self-hosted GitHub Actions runners on EC2 via runs-on.com for jobs requiring private network access (database migrations, Terraform) through Transit Gateway.
 
+## Problems this Architecture solves
+
+- Enables CI/CD jobs that must reach private infrastructure and internal services not accessible from hosted runners.
+- Avoids keeping long-lived build workers running all the time by scaling runners up only when jobs exist.
+- Centralizes caching, logging, and operational visibility for privileged automation workloads.
+
 ```mermaid
 flowchart TD
     GH["GitHub<br/>Repository"]

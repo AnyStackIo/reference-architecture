@@ -6,6 +6,12 @@ title: ArgoCD GitOps
 
 Kubernetes deployments with GitOps workflow.
 
+## Problems this Architecture solves
+
+- Prevents cluster drift by continuously reconciling live state back to what is declared in Git.
+- Reduces manual `kubectl` deployment workflows that are hard to audit and roll back safely.
+- Improves visibility into release health with explicit sync and application status in the control plane.
+
 ```mermaid
 flowchart LR
     Repo["Git Repository<br/>manifests/"]

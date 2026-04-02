@@ -1,18 +1,271 @@
 ---
-title: IAM & SSO Architecture
+title: Users and Permissions
 sidebar_position: 4
 ---
 
-# IAM & SSO Architecture
+# Users and Permissions
 
 Federated access with AWS IAM Identity Center (SSO) and fine-grained permission sets.
+This design connects an external identity provider to AWS so users authenticate once and receive the right level of access across every account. It turns group membership and permission sets into the primary control model, which keeps access consistent as environments and teams grow.
 
-## Overview
+## Problems this Architecture solves
 
-Centralized identity management with SAML federation and SSO-based access to all AWS accounts.
+- Removes the need for long-lived IAM users and scattered account-by-account credentials.
+- Standardizes how teams get access across environments with group-based, least-privilege permissions.
+- Makes onboarding, offboarding, and permission changes easier to control from one identity plane.
 
-## Diagrams
+## Identity Federation
 
-- [Identity Federation](./iam/federation) - SAML federation with IdP
-- [Group Mapping](./iam/group-mapping) - IdP groups to SSO permission sets
-- [Permission Sets](./iam/permission-sets) - Least-privilege access control
+Centrally managed users via IAM Identity Center, integrated with your IdP of choice (Okta, Google Workspace, Microsoft Entra, etc.)
+
+```mermaid
+flowchart TD
+    subgraph IdP["Identity Providers"]
+        Okta["Okta<br/>SAML/SCIM"]
+        Google["Google Workspace<br/>SAML/SCIM"]
+        MS["Microsoft Entra<br/>SAML/SCIM"]
+    end
+
+    IAM["IAM Identity Center<br/>Single Sign-On"]
+
+    subgraph CoreOU["Core OU"]
+        Root["root"]
+        Sec["security"]
+        Net["network"]
+        DNS["dns"]
+        Auto["auto"]
+        Art["artifacts"]
+    end
+
+    subgraph PlatOU["Platform OU"]
+        Dev["dev"]
+        Stg["staging"]
+        Prd["prod"]
+    end
+
+    Okta -->|SAML| IAM
+    Google -->|SAML| IAM
+    MS -->|SAML| IAM
+
+    IAM --> CoreOU
+    IAM --> PlatOU
+
+    style Okta fill:#3498db,color:#fff
+    style Google fill:#3498db,color:#fff
+    style MS fill:#3498db,color:#fff
+    style IAM fill:#f39c12,color:#000
+    style CoreOU fill:#c0392b,color:#fff
+    style PlatOU fill:#27ae60,color:#fff
+```
+
+### Key Features
+
+- **SAML 2.0 Federation**: Integrate with any SAML-compatible IdP
+- **SCIM Provisioning**: Automatic user/group sync from IdP to AWS
+- **Single Sign-On**: One login for all AWS accounts
+- **MFA Enforcement**: Require MFA at IdP level
+- **Session Duration**: Configurable session timeout (1-12 hours)
+- **No IAM Users**: All access via SSO, including root account
+
+### Supported Identity Providers
+
+- Okta
+- Google Workspace
+- Microsoft Entra ID (Azure AD)
+- JumpCloud
+- OneLogin
+- Any SAML 2.0 compatible IdP
+
+### Authentication Flow
+
+1. User navigates to AWS access portal
+2. Redirected to IdP for authentication
+3. User enters credentials + MFA
+4. IdP returns SAML assertion to AWS
+5. IAM Identity Center validates assertion
+6. User selects account and permission set
+7. Temporary credentials issued (AssumeRoleWithSAML)
+
+## Group Mapping
+
+IdP groups mapped to SSO permission sets across AWS accounts for role-based access control.
+
+```mermaid
+flowchart LR
+    subgraph Groups["SSO Groups"]
+        DevOps["DevOps"]
+        Devs["Developers"]
+    end
+
+    subgraph DevAcc["Dev Account"]
+        DevApply["TerraformApplyAccess"]
+        DevPlan["TerraformPlanAccess"]
+    end
+
+    subgraph ProdAcc["Prod Account"]
+        ProdApply["TerraformApplyAccess"]
+        ProdPlan["TerraformPlanAccess"]
+    end
+
+    DevOps -.-> DevApply
+    DevOps -.-> ProdApply
+
+    Devs -.-> DevPlan
+    Devs -.-> ProdPlan
+
+    style DevOps fill:#95a5a6,color:#000
+    style Devs fill:#95a5a6,color:#000
+    style DevApply fill:#27ae60,color:#fff
+    style DevPlan fill:#3498db,color:#fff
+    style ProdApply fill:#27ae60,color:#fff
+    style ProdPlan fill:#3498db,color:#fff
+```
+
+### Key Features
+
+- **Group-Based Access**: Assign permissions via IdP groups
+- **Automatic Sync**: SCIM keeps groups in sync
+- **Least Privilege**: Developers get read-only in prod
+- **Separation of Duties**: Different permissions per environment
+
+### Example Mappings
+
+#### DevOps Team
+
+- **Dev Account**: TerraformApplyAccess (write)
+- **Prod Account**: TerraformApplyAccess (write)
+- **Purpose**: Full infrastructure management
+
+#### Developers
+
+- **Dev Account**: TerraformPlanAccess (read-only)
+- **Prod Account**: TerraformPlanAccess (read-only)
+- **Purpose**: View infrastructure, no changes
+
+#### Platform Team
+
+- **All Accounts**: AdministratorAccess
+- **Purpose**: Full AWS console access
+
+#### Security Team
+
+- **core-security**: AdministratorAccess
+- **All Accounts**: ReadOnlyAccess + SecurityAudit
+- **Purpose**: Security monitoring and incident response
+
+## Permission Sets
+
+Least-privilege access with custom and AWS-managed permission sets for fine-grained control.
+
+```mermaid
+flowchart TD
+    IAM["IAM Identity Center<br/>Permission Sets"]
+
+    subgraph AWSManaged["AWS Managed"]
+        Admin["AdministratorAccess<br/>Full Admin"]
+        Power["PowerUserAccess<br/>Non-IAM Admin"]
+        RO["ReadOnlyAccess<br/>View Only"]
+        Bill["Billing<br/>Cost Management"]
+    end
+
+    subgraph Terraform["Terraform"]
+        TFApply["TerraformApply<br/>Write Access"]
+        TFPlan["TerraformPlan<br/>Read-Only Plan"]
+        TFState["TerraformState<br/>State Access"]
+    end
+
+    subgraph Custom["Custom"]
+        RootAcc["RootAccess<br/>Privileged Ops"]
+    end
+
+    subgraph Targets["Target Accounts"]
+        CoreOU["Core OU<br/>audit, security, network<br/>dns, auto, artifacts"]
+        PlatOU["Platform OU<br/>dev, staging, prod"]
+        MgmtAcc["Management Account<br/>root"]
+    end
+
+    IAM --> AWSManaged
+    IAM --> Terraform
+    IAM --> Custom
+
+    AWSManaged --> CoreOU
+    AWSManaged --> PlatOU
+    AWSManaged --> MgmtAcc
+
+    Terraform --> CoreOU
+    Terraform --> PlatOU
+
+    Custom --> MgmtAcc
+
+    style IAM fill:#f39c12,color:#000
+    style Admin fill:#c0392b,color:#fff
+    style Power fill:#e67e22,color:#fff
+    style RO fill:#3498db,color:#fff
+    style Bill fill:#f39c12,color:#000
+    style TFApply fill:#27ae60,color:#fff
+    style TFPlan fill:#3498db,color:#fff
+    style TFState fill:#9b59b6,color:#fff
+    style RootAcc fill:#c0392b,color:#fff
+```
+
+### AWS Managed Permission Sets
+
+#### AdministratorAccess
+
+- **Policy**: `arn:aws:iam::aws:policy/AdministratorAccess`
+- **Use Case**: Platform team, emergency access
+- **Permissions**: Full access to all AWS services
+
+#### PowerUserAccess
+
+- **Policy**: `arn:aws:iam::aws:policy/PowerUserAccess`
+- **Use Case**: Developers needing broad access without IAM changes
+- **Permissions**: All services except IAM and Organizations
+
+#### ReadOnlyAccess
+
+- **Policy**: `arn:aws:iam::aws:policy/ReadOnlyAccess`
+- **Use Case**: Auditors, support staff, read-only access
+- **Permissions**: Read-only access to all services
+
+#### Billing
+
+- **Policy**: `arn:aws:iam::aws:policy/job-function/Billing`
+- **Use Case**: Finance team, cost management
+- **Permissions**: View and manage billing, Cost Explorer, Budgets
+
+### Terraform Permission Sets
+
+#### TerraformApply
+
+- **Permissions**: Full Terraform operations (plan, apply, destroy)
+- **Use Case**: CI/CD pipelines, DevOps team
+- **Includes**: EC2, VPC, RDS, S3, IAM (limited), etc.
+
+#### TerraformPlan
+
+- **Permissions**: Read-only Terraform plan operations
+- **Use Case**: Developers reviewing infrastructure changes
+- **Includes**: Describe/List operations only
+
+#### TerraformState
+
+- **Permissions**: S3 state file access, DynamoDB locking
+- **Use Case**: Terraform backend operations
+- **Includes**: S3 GetObject/PutObject, DynamoDB GetItem/PutItem
+
+### Custom Permission Sets
+
+#### RootAccess
+
+- **Permissions**: Privileged operations requiring root account
+- **Use Case**: Account closure, support plan changes, MFA reset
+- **Includes**: Organizations management, billing configuration
+
+### Key Features
+
+- **No IAM Users**: All access via SSO-based permission sets
+- **Service Control Policies**: SCPs enforce guardrails at OU level
+- **Session Duration**: 1-12 hours configurable per permission set
+- **MFA Requirement**: Can enforce MFA for sensitive permission sets
+- **Permission Boundaries**: Limit maximum permissions for delegated admin

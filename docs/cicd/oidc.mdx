@@ -6,6 +6,12 @@ title: GitHub OIDC
 
 GitHub Actions authenticates to AWS using OIDC federation — no static credentials required, workflows assume IAM roles directly.
 
+## Problems this Architecture solves
+
+- Eliminates the need to store long-lived AWS access keys in GitHub secrets.
+- Restricts deployment access to specific repositories, branches, and workflows through role trust policies.
+- Improves auditability by tying role assumption and deployment activity to short-lived CI identities.
+
 ```mermaid
 sequenceDiagram
     participant Dev as Developer

@@ -7,10 +7,10 @@ const config = {
   tagline: "Internal architecture references",
   favicon: "img/favicon.ico",
 
-  // GitHub Pages project site:
-  // https://anystackio.github.io/reference-architecture/
-  url: "https://anystackio.github.io",
-  baseUrl: "/reference-architecture/",
+  // GitHub Pages custom domain:
+  // https://architecture.any-stack.com/
+  url: "https://architecture.any-stack.com",
+  baseUrl: "/",
 
   organizationName: "AnyStackIo",
   projectName: "reference-architecture",

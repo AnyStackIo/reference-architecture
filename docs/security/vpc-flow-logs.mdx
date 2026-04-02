@@ -6,6 +6,12 @@ title: VPC Flow Logs
 
 VPC Flow Logs from all accounts centralized in the audit account for network visibility.
 
+## Problems this Architecture solves
+
+- Provides a shared network audit trail instead of leaving traffic visibility fragmented by account.
+- Makes suspicious east-west and north-south traffic easier to investigate during incidents.
+- Supports troubleshooting, compliance, and traffic analysis without depending on per-team log storage decisions.
+
 ```mermaid
 flowchart TD
     subgraph VPCs["VPCs Across Accounts"]

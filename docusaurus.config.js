@@ -50,19 +50,21 @@ const config = {
   themeConfig: {
     colorMode: {
       defaultMode: "dark",
+      disableSwitch: true,
+      respectPrefersColorScheme: false,
     },
     navbar: {
       title: "AnyStack",
       items: [
-        { type: "doc", docId: "index", label: "Diagrams", position: "left" },
+        { type: "doc", docId: "index", label: "AWS Reference Architecture", position: "left" },
       ],
     },
     footer: {
       copyright: `Copyright © ${new Date().getFullYear()} AnyStack.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.oneLight,
+      darkTheme: prismThemes.nightOwl,
     },
   },
 };

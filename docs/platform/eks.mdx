@@ -6,6 +6,12 @@ title: EKS Architecture
 
 Managed Kubernetes with Karpenter autoscaling and GitOps deployment via ArgoCD.
 
+## Problems this Architecture solves
+
+- Reduces the cost and latency of static node-group sizing by provisioning compute based on actual pod demand.
+- Standardizes Kubernetes operations, addons, and ingress patterns across teams and workloads.
+- Improves deployment consistency by connecting cluster state to Git-managed manifests and reconciliation.
+
 ```mermaid
 flowchart TD
     R53["Route 53<br/>External DNS"]

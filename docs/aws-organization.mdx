@@ -1,17 +1,202 @@
 ---
-title: AWS Organization Structure
+title: AWS Accounts
 sidebar_position: 1
 ---
 
-# AWS Organization Structure
+# AWS Accounts
 
 Multi-account strategy with AWS Organizations for isolation, security, and cost management.
+This layout separates management, shared services, and workload environments so governance stays centralized while teams still operate inside clear account boundaries. It provides the structural foundation for scaling access, networking, security, and software delivery without collapsing everything into one shared AWS account.
 
-## Overview
+## Problems this Architecture solves
 
-This section covers the organizational structure using AWS Organizations with Organizational Units (OUs) and account hierarchy.
+- Reduces the blast radius that comes from running shared services and workloads in the same AWS account.
+- Creates clear ownership boundaries between foundational services, lower environments, and production workloads.
+- Centralizes governance, billing, and guardrails so multi-account growth stays manageable over time.
 
-## Diagrams
+## Organization Overview
 
-- [Organization Overview](./aws-organization/overview) - Hierarchical org structure with OUs and accounts
-- [Account Details](./aws-organization/accounts) - Breakdown of each account and its purpose
+Hierarchical AWS Organization structure with Organizational Units and account hierarchy.
+
+```mermaid
+graph TD
+    Root["MANAGEMENT<br/>core-root<br/>Billing & Organizations"]
+
+    CoreOU["Core OU<br/>Foundation Accounts"]
+    PlatOU["Platform OU<br/>Workload Accounts"]
+
+    Root --> CoreOU
+    Root --> PlatOU
+
+    CoreOU --> Audit["core-audit<br/>CloudTrail"]
+    CoreOU --> Security["core-security<br/>GuardDuty"]
+    CoreOU --> Network["core-network<br/>Transit GW"]
+    CoreOU --> DNS["core-dns<br/>Route 53"]
+    CoreOU --> Artifacts["core-artifacts<br/>ECR/S3"]
+    CoreOU --> Auto["core-auto<br/>CI/CD"]
+
+    PlatOU --> Sandbox["plat-sandbox<br/>Experiments"]
+    PlatOU --> Dev["plat-dev<br/>Development"]
+    PlatOU --> Staging["plat-staging<br/>Pre-prod"]
+    PlatOU --> Prod["plat-prod<br/>Production"]
+
+    style Root fill:#f90,color:#000
+    style CoreOU fill:#e74c3c,color:#fff
+    style PlatOU fill:#27ae60,color:#fff
+    style Audit fill:#c0392b,color:#fff
+    style Security fill:#c0392b,color:#fff
+    style Network fill:#3498db,color:#fff
+    style DNS fill:#3498db,color:#fff
+    style Artifacts fill:#3498db,color:#fff
+    style Auto fill:#3498db,color:#fff
+    style Sandbox fill:#2ecc71,color:#000
+    style Dev fill:#2ecc71,color:#000
+    style Staging fill:#3498db,color:#fff
+    style Prod fill:#f39c12,color:#000
+```
+
+### Key Features
+
+- **Management Account (core-root)**: Organization management and billing consolidation
+- **Core OU**: Foundation accounts for shared services (artifacts, audit, auto, dns, network, security)
+- **Platform OU**: Workload accounts for different environments (sandbox, dev, staging, prod)
+- **Service Control Policies**: Organizational guardrails applied at OU level
+- **Account-level isolation**: Each account provides a security boundary with cross-account access patterns
+
+## Account Details
+
+Detailed breakdown of each AWS account and its purpose.
+
+### Management Account
+
+```mermaid
+graph LR
+    Root["core-root<br/>Management"]
+
+    Root --> Orgs["AWS Organizations"]
+    Root --> Billing["Consolidated Billing"]
+    Root --> IAM["IAM Identity Center"]
+    Root --> Control["Control Tower"]
+
+    style Root fill:#f90,color:#000
+    style Orgs fill:#555,color:#fff
+    style Billing fill:#555,color:#fff
+    style IAM fill:#555,color:#fff
+    style Control fill:#555,color:#fff
+```
+
+#### Key Services
+
+- **AWS Organizations**: Manage all member accounts
+- **Consolidated Billing**: Single billing for all accounts
+- **IAM Identity Center**: Centralized SSO and access management
+- **Control Tower**: Automated account provisioning and governance
+
+### Core OU - Foundation Accounts
+
+```mermaid
+graph TD
+    subgraph Security["Security Accounts"]
+        Audit["core-audit<br/>CloudTrail, Config, S3"]
+        Sec["core-security<br/>GuardDuty, Security Hub"]
+    end
+
+    subgraph Shared["Shared Services"]
+        Network["core-network<br/>Transit Gateway, Firewall"]
+        DNS["core-dns<br/>Route 53, DNS Firewall"]
+        Artifacts["core-artifacts<br/>ECR, S3, CodeArtifact"]
+        Auto["core-auto<br/>GitHub Runners, CodeBuild"]
+    end
+
+    style Audit fill:#c0392b,color:#fff
+    style Sec fill:#c0392b,color:#fff
+    style Network fill:#3498db,color:#fff
+    style DNS fill:#3498db,color:#fff
+    style Artifacts fill:#3498db,color:#fff
+    style Auto fill:#3498db,color:#fff
+```
+
+#### core-audit
+
+- **CloudTrail**: Organization-wide audit logs
+- **AWS Config**: Resource compliance tracking
+- **S3 Audit Buckets**: Centralized log storage with encryption
+- **Athena**: Log analysis and querying
+
+#### core-security
+
+- **GuardDuty**: Delegated administrator for threat detection
+- **Security Hub**: Centralized security findings
+- **Inspector**: Vulnerability scanning
+- **Macie**: Data security and privacy
+
+#### core-network
+
+- **Transit Gateway**: Central network hub
+- **Network Firewall**: Centralized traffic inspection
+- **Route 53 Resolver**: DNS resolution
+- **Client VPN**: Remote access for developers
+
+#### core-dns
+
+- **Route 53 Hosted Zones**: Domain management and registration
+- **DNS Firewall**: Malicious domain blocking
+- **ACM**: Public certificate management
+- **Health Checks**: Endpoint monitoring
+
+#### core-artifacts
+
+- **ECR**: Shared container images
+- **S3**: Artifact storage (Terraform state, build artifacts)
+- **CodeArtifact**: Package repository
+- **Terraform State**: Centralized state management
+
+#### core-auto
+
+- **GitHub Runners (EC2)**: Self-hosted CI/CD runners
+- **CodeBuild**: Build automation
+- **CodePipeline**: Deployment pipelines
+- **Spacelift/Atlantis**: Terraform automation
+
+### Platform OU - Workload Accounts
+
+```mermaid
+graph LR
+    Sandbox["plat-sandbox<br/>EKS/ECS, RDS, S3<br/>Unrestricted"]
+    Dev["plat-dev<br/>EKS/ECS, RDS<br/>ElastiCache, SQS/SNS"]
+    Staging["plat-staging<br/>EKS/ECS, RDS<br/>ElastiCache, Load Testing"]
+    Prod["plat-prod<br/>EKS/ECS, RDS Multi-AZ<br/>ElastiCache, CloudFront, WAF"]
+
+    style Sandbox fill:#2ecc71,color:#000
+    style Dev fill:#2ecc71,color:#000
+    style Staging fill:#3498db,color:#fff
+    style Prod fill:#f39c12,color:#000
+```
+
+#### plat-sandbox
+
+- **Purpose**: Experimental workloads and developer testing
+- **Key Services**: EKS/ECS, RDS, Lambda, S3
+- **Access**: Unrestricted experimentation
+- **Owner**: Developers
+
+#### plat-dev
+
+- **Purpose**: Development environment for feature branches
+- **Key Services**: EKS/ECS, RDS, ElastiCache, SQS/SNS
+- **Access**: Developer full access
+- **Owner**: Developers
+
+#### plat-staging
+
+- **Purpose**: Pre-production testing and QA validation
+- **Key Services**: EKS/ECS, RDS (production-like), ElastiCache, Load Testing
+- **Access**: Platform team and QA
+- **Owner**: Platform Team
+
+#### plat-prod
+
+- **Purpose**: Production workloads serving live traffic
+- **Key Services**: EKS/ECS, RDS (Multi-AZ), ElastiCache, CloudFront, WAF
+- **Access**: Restricted, read-only for most users
+- **Owner**: Platform Team

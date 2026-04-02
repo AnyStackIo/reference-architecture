@@ -6,6 +6,12 @@ title: CloudTrail Architecture
 
 Organization-wide CloudTrail logs centralized in the audit account S3 bucket with encryption at rest.
 
+## Problems this Architecture solves
+
+- Prevents audit logs from being scattered across accounts where they are harder to review and protect.
+- Reduces the risk of losing or tampering with API activity records needed for investigations and audits.
+- Improves analysis by centralizing retention, querying, and alerting on control-plane activity.
+
 ```mermaid
 flowchart TD
     subgraph Accounts["Member Accounts"]

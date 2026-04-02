@@ -49,11 +49,13 @@ const config = {
   ],
 
   themeConfig: {
+    colorMode: {
+      defaultMode: "dark",
+    },
     navbar: {
       title: "AnyStack",
       items: [
         { type: "doc", docId: "index", label: "Diagrams", position: "left" },
-        { href: "https://github.com/AnyStackIo/reference-architecture", label: "Repo", position: "right" },
       ],
     },
     footer: {

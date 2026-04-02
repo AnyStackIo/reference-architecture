@@ -5,6 +5,9 @@
   --ifm-color-primary: #111827;
   --ifm-navbar-background-color: #ffffff;
 }
-[data-theme="dark"] { --ifm-color-primary: #e5e7eb; }
+[data-theme="dark"] {
+  --ifm-color-primary: #e5e7eb;
+  --ifm-navbar-background-color: #111827;
+}
 .navbar__title { font-weight: 700; letter-spacing: -0.02em; }
 .markdown h1, .markdown h2, .markdown h3 { letter-spacing: -0.02em; }

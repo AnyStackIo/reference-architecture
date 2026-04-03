@@ -7,17 +7,17 @@ module.exports = {
       items: [
         {
           type: "doc",
-          id: "aws-organization",
+          id: "aws-accounts",
           label: "AWS Accounts",
         },
         {
           type: "doc",
-          id: "iam-sso",
+          id: "identity",
           label: "Users and Permissions",
         },
         {
           type: "doc",
-          id: "network-dns",
+          id: "network",
           label: "Network and DNS",
         },
       ],
@@ -37,7 +37,7 @@ module.exports = {
         {
           type: "category",
           label: "Software Delivery",
-          link: { type: "doc", id: "software-delivery" },
+          link: { type: "doc", id: "cicd" },
           items: [
             "cicd/workflow",
             "cicd/runners",

@@ -7,96 +7,94 @@ hide_title: true
 hide_table_of_contents: true
 ---
 
-<div className="landing-shell">
-  <section className="landing-hero">
-    <p className="landing-hero__eyebrow">AnyStack</p>
-    <h1><span className="landing-gradient">AWS Architecture that scales</span></h1>
-    <p className="landing-hero__lede">This reference architecture describes a secure multi-account AWS foundation built to scale with an organization. It showcases architecture patterns that can be used by organizations of any size, with identity, governance, logging, and security controls centralized while workloads are isolated into purpose-built accounts to reduce blast radius and keep growth manageable.</p>
-  </section>
+<p className="landing-hero__eyebrow">AnyStack</p>
+<h1 className="landing-hero__title">
+  <span className="landing-gradient">Architecture Patterns</span>
+  <span className="landing-gradient">that Scale</span>
+</h1>
+<p className="landing-hero__lede">This reference architecture describes a secure multi-account AWS foundation built to scale with an organization. It showcases architecture patterns that can be used by organizations of any size, with identity, governance, logging, and security controls centralized while workloads are isolated into purpose-built accounts to reduce blast radius and keep growth manageable.</p>
 
-  <section className="landing-section">
-    <h2 className="landing-section__title">Landing zone</h2>
-    <div className="landing-grid">
-      <a className="landing-card" href="./aws-organization">
-        <span className="landing-card__eyebrow">Foundation</span>
-        <h3>AWS Accounts</h3>
-        <p>Multi-account layout, organizational units, account intent, and shared-services placement.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
+<section className="landing-section">
+  <h2 className="landing-section__title">Landing zone</h2>
+  <div className="landing-grid">
+    <a className="landing-card" href="./aws-accounts">
+      <span className="landing-card__eyebrow">Foundation</span>
+      <h3>AWS Accounts</h3>
+      <p>Stops one shared AWS account from turning every team, budget, and incident into the same problem.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
 
-      <a className="landing-card" href="./iam-sso">
-        <span className="landing-card__eyebrow">Identity</span>
-        <h3>Users and Permissions</h3>
-        <p>Federation, group mapping, permission sets, and access boundaries across accounts.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
+    <a className="landing-card" href="./identity">
+      <span className="landing-card__eyebrow">Identity</span>
+      <h3>Users and Permissions</h3>
+      <p>Replaces access sprawl with a single control plane for onboarding, offboarding, and least-privilege at scale.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
 
-      <a className="landing-card" href="./network-dns">
-        <span className="landing-card__eyebrow">Connectivity</span>
-        <h3>Network and DNS</h3>
-        <p>Hub-and-spoke VPCs, Transit Gateway routing, shared DNS, and traffic inspection flow.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
-    </div>
-  </section>
+    <a className="landing-card" href="./network">
+      <span className="landing-card__eyebrow">Connectivity</span>
+      <h3>Network and DNS</h3>
+      <p>Prevents every new workload from inventing its own network, ingress, and DNS strategy.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
+  </div>
+</section>
 
-  <section className="landing-section">
-    <h2 className="landing-section__title">Platform</h2>
-    <div className="landing-grid landing-grid--platform">
-      <a className="landing-card" href="./platform/ecs">
-        <span className="landing-card__eyebrow">Runtime</span>
-        <h3>ECS Architecture</h3>
-        <p>Container orchestration with Fargate, service discovery, load balancers, and autoscaling.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
+<section className="landing-section">
+  <h2 className="landing-section__title">Platform</h2>
+  <div className="landing-grid landing-grid--platform">
+    <a className="landing-card" href="./platform/ecs">
+      <span className="landing-card__eyebrow">Runtime</span>
+      <h3>ECS Architecture</h3>
+      <p>Gives teams a fast path to run containers without taking on Kubernetes platform overhead.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
 
-      <a className="landing-card" href="./platform/eks">
-        <span className="landing-card__eyebrow">Runtime</span>
-        <h3>EKS Architecture</h3>
-        <p>Managed Kubernetes with Karpenter, GitOps workflows, and cluster-level platform services.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
+    <a className="landing-card" href="./platform/eks">
+      <span className="landing-card__eyebrow">Runtime</span>
+      <h3>EKS Architecture</h3>
+      <p>Standardizes Kubernetes so product teams do not burn time rebuilding the same platform primitives.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
 
-      <a className="landing-card" href="./software-delivery">
-        <span className="landing-card__eyebrow">Delivery</span>
-        <h3>Software Delivery</h3>
-        <p>CI/CD pipelines, OIDC federation, runner strategy, and GitOps release flow into target environments.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
-    </div>
-  </section>
+    <a className="landing-card" href="./cicd">
+      <span className="landing-card__eyebrow">Delivery</span>
+      <h3>Software Delivery</h3>
+      <p>Turns releases from tribal knowledge and long-lived secrets into a repeatable, auditable delivery system.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
+  </div>
+</section>
 
-  <section className="landing-section">
-    <h2 className="landing-section__title">Security</h2>
-    <div className="landing-grid">
-      <a className="landing-card" href="./security/compliance">
-        <span className="landing-card__eyebrow">Monitoring</span>
-        <h3>Compliance Monitoring</h3>
-        <p>Centralized findings, threat detection, config evaluation, and compliance evidence collection.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
+<section className="landing-section">
+  <h2 className="landing-section__title">Security</h2>
+  <div className="landing-grid">
+    <a className="landing-card" href="./security/compliance">
+      <span className="landing-card__eyebrow">Monitoring</span>
+      <h3>Compliance Monitoring</h3>
+      <p>Surfaces drift and control failures early instead of discovering them during audits or incidents.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
 
-      <a className="landing-card" href="./security/defense-in-depth">
-        <span className="landing-card__eyebrow">Layers</span>
-        <h3>Defense in Depth</h3>
-        <p>Layered controls across perimeter, network, endpoint, application, and data boundaries.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
+    <a className="landing-card" href="./security/defense-in-depth">
+      <span className="landing-card__eyebrow">Layers</span>
+      <h3>Defense in Depth</h3>
+      <p>Reduces single points of failure so one missed control does not become a full-environment compromise.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
 
-      <a className="landing-card" href="./security/cloudtrail">
-        <span className="landing-card__eyebrow">Audit</span>
-        <h3>CloudTrail Architecture</h3>
-        <p>Organization-wide API logging centralized for retention, analysis, and incident response.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
+    <a className="landing-card" href="./security/cloudtrail">
+      <span className="landing-card__eyebrow">Audit</span>
+      <h3>CloudTrail Architecture</h3>
+      <p>Preserves a trustworthy account of who changed what, before incident response turns into guesswork.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
 
-      <a className="landing-card" href="./security/vpc-flow-logs">
-        <span className="landing-card__eyebrow">Network</span>
-        <h3>VPC Flow Logs</h3>
-        <p>Centralized network visibility across accounts for investigation, troubleshooting, and detection.</p>
-        <span className="landing-card__cta">Open architecture</span>
-      </a>
-    </div>
-  </section>
-
-</div>
+    <a className="landing-card" href="./security/vpc-flow-logs">
+      <span className="landing-card__eyebrow">Network</span>
+      <h3>VPC Flow Logs</h3>
+      <p>Gives teams network evidence when outages or suspicious traffic cross account and VPC boundaries.</p>
+      <span className="landing-card__cta">Open architecture</span>
+    </a>
+  </div>
+</section>
